@@ -1,10 +1,10 @@
-# Cermuel Hooks
+# Hooks
 
 Practical, type-safe hooks and composables for everyday frontend development.
 
 ## About
 
-Cermuel Hooks is an open-source collection of reusable utilities for React and Vue.
+Hooks is an open-source collection of reusable utilities for React and Vue.
 
 The project includes a Nuxt-powered documentation website and a single npm package with framework-specific exports.
 
