@@ -1,0 +1,42 @@
+name: Hook request
+description: Suggest a new hook or composable.
+title: "feat: add "
+labels:
+  - enhancement
+body:
+  - type: input
+    id: proposed-name
+    attributes:
+      label: Proposed name
+      placeholder: useCopyToClipboard
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Everyday use case
+      description: What common frontend problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Expected API
+      description: Describe the return value, options and edge cases.
+    validations:
+      required: true
+  - type: textarea
+    id: react-example
+    attributes:
+      label: React example
+      render: tsx
+  - type: textarea
+    id: vue-example
+    attributes:
+      label: Vue example
+      render: vue
+  - type: textarea
+    id: browser-api
+    attributes:
+      label: Relevant browser API
+      description: List platform APIs this may need, if any.
