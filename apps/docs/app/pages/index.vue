@@ -9,24 +9,26 @@
         Cermuel Hooks keeps framework-specific APIs thin, typed and SSR-aware while sharing the behavior that should stay consistent.
       </p>
       <div class="flex flex-col gap-3 sm:flex-row">
-        <a
+        <SharedAtomsButtonAtom
+          label="Get started"
           href="#installation"
-          class="inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 text-sm font-medium text-accent-foreground transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          Get started
-        </a>
-        <a
+          size="md"
+          right-icon="hugeicons:arrow-right-02"
+        />
+        <SharedAtomsButtonAtom
+          label="GitHub"
           href="https://github.com/cermuel/cermuel-hooks"
-          class="inline-flex h-11 items-center justify-center rounded-md border border-border bg-card px-5 text-sm font-medium text-card-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          GitHub
-        </a>
+          variant="secondary"
+          size="md"
+          left-icon="hugeicons:github"
+          external
+        />
       </div>
     </div>
 
     <div id="installation" class="rounded-md border border-border bg-card p-5 text-card-foreground shadow-sm">
       <div class="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <Icon name="lucide:terminal" class="size-4" />
+        <Icon name="hugeicons:terminal" class="size-4" />
         Installation
       </div>
       <pre class="overflow-x-auto rounded-md bg-muted p-4 text-sm"><code>npm install @cermuel/hooks</code></pre>
