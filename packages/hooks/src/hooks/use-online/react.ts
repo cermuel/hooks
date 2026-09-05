@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getOnlineStatus, subscribeToOnlineStatus } from "../core/online";
+import { getOnlineStatus, subscribeToOnlineStatus } from "./core";
 
 export function useOnline(): boolean {
   const [online, setOnline] = useState(getOnlineStatus);

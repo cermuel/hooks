@@ -7,11 +7,15 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm --filter docs dev",
+    "create:hook": "node scripts/create-hook.ts",
+    "remove:hook": "node scripts/remove-hook.ts",
+    "generate:hooks-registry": "node scripts/generate-hooks-registry.ts",
+    "check:hooks": "node scripts/check-hooks.ts",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm check:hooks && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

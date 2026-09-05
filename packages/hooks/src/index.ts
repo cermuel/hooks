@@ -1,1 +1,1 @@
-export { getOnlineStatus, subscribeToOnlineStatus } from "./core/online";
+export { getOnlineStatus, subscribeToOnlineStatus } from "./hooks/use-online/core";

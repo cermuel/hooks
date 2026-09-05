@@ -33,7 +33,7 @@ import { HOOK_CARDS } from "~/constants/home";
     </div>
 
     <div
-      class="grid grid-cols-1 gap-4 [grid-auto-rows:19rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      class="grid grid-cols-1 gap-4 [grid-auto-rows:19rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
     >
       <article
         v-for="hook in HOOK_CARDS"
@@ -48,10 +48,11 @@ import { HOOK_CARDS } from "~/constants/home";
         <div
           class="relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card transition-colors duration-300 contain-[paint] group-hover/card:border-border-strong"
         >
-          <div
-            class="relative m-2 mb-0 min-h-0 flex-1 overflow-hidden"
-          >
-            <AtomCodeBlock :code="hook.snippet" class="h-full text-left text-xs leading-6" />
+          <div class="relative m-2 mb-0 min-h-0 flex-1 overflow-hidden">
+            <AtomCodeBlock
+              :code="hook.snippet"
+              class="h-full text-left text-xs leading-6"
+            />
           </div>
           <div
             class="flex shrink-0 items-center justify-between gap-3 px-4 py-3.5"
