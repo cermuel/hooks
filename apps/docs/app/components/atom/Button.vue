@@ -22,6 +22,7 @@ const props = withDefaults(
     type?: ButtonType;
     disabled?: boolean;
     iconOnly?: boolean;
+    static?: boolean;
     pressScale?: number;
     ripple?: boolean;
     ariaLabel?: string;
@@ -32,6 +33,7 @@ const props = withDefaults(
     size: "md",
     type: "button",
     iconOnly: false,
+    static: false,
     pressScale: 0.93,
     ripple: false,
     leftIcon: undefined,
@@ -72,7 +74,7 @@ const buttonClasses = computed(() => [
   "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   "disabled:pointer-events-none disabled:opacity-45",
   props.disabled && isLink.value ? "pointer-events-none opacity-45" : "",
-  !props.disabled ? "active:scale-[0.96]" : "",
+  !props.disabled && !props.static ? "active:scale-[0.96]" : "",
   props.iconOnly
     ? {
         sm: "size-8 rounded-lg",
@@ -94,7 +96,7 @@ const buttonClasses = computed(() => [
 ]);
 
 const buttonStyle = computed(() => {
-  if (!pressed.value || props.disabled) {
+  if (!pressed.value || props.disabled || props.static) {
     return undefined;
   }
 
@@ -113,12 +115,16 @@ const iconClasses = computed(
 );
 
 const leftIconClasses = computed(() => [
-  "relative z-10 transition-transform duration-200 ease-out",
+  "relative z-10",
+  !props.static ? "transition-transform duration-200 ease-out" : "",
   iconClasses.value,
 ]);
 
 const rightIconClasses = computed(() => [
-  "relative z-10 transition-transform duration-200 ease-out group-hover:translate-x-0.5",
+  "relative z-10",
+  !props.static
+    ? "transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+    : "",
   iconClasses.value,
 ]);
 

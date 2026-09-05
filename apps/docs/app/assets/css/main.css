@@ -27,6 +27,16 @@
   --glass-thin-bg: rgb(255 255 255 / 0.45);
   --gradient-bg: linear-gradient(135deg, oklch(99% 0 0) 0%, oklch(96% 0.008 210) 100%);
   --gradient-accent: linear-gradient(to right, oklch(72% 0.18 195) 0%, oklch(68% 0.22 295) 100%);
+  --code-surface: oklch(12% 0 0);
+  --code-border: oklch(100% 0 0 / 0.08);
+  --code-base: oklch(92% 0 0);
+  --code-muted: oklch(62% 0 0);
+  --code-prompt: oklch(68% 0 0);
+  --code-command: oklch(72% 0.17 48);
+  --code-package: oklch(76% 0.16 242);
+  --code-flag: oklch(78% 0.14 300);
+  --code-keyword: oklch(78% 0.14 300);
+  --code-string: oklch(76% 0.16 242);
 
   /* shadcn semantic tokens, mapped onto the base. */
   --card-foreground: var(--foreground);
@@ -60,6 +70,8 @@
   --glass-thin-bg: rgb(21 21 21 / 0.45);
   --gradient-bg: linear-gradient(135deg, oklch(19% 0 0) 0%, oklch(22% 0.008 210) 100%);
   --gradient-accent: linear-gradient(to right, oklch(80% 0.18 195) 0%, oklch(72% 0.18 295) 100%);
+  --code-surface: oklch(12% 0 0);
+  --code-border: rgb(255 255 255 / 0.08);
 }
 
 @theme inline {
@@ -92,6 +104,16 @@
   --color-destructive: var(--destructive);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-code-surface: var(--code-surface);
+  --color-code-border: var(--code-border);
+  --color-code-base: var(--code-base);
+  --color-code-muted: var(--code-muted);
+  --color-code-prompt: var(--code-prompt);
+  --color-code-command: var(--code-command);
+  --color-code-package: var(--code-package);
+  --color-code-flag: var(--code-flag);
+  --color-code-keyword: var(--code-keyword);
+  --color-code-string: var(--code-string);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

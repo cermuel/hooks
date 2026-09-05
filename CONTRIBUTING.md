@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for contributing to Cermuel Hooks.
+Thank you for contributing to Hooks.
 
 ## Before You Begin
 

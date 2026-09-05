@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Cermuel Hooks is an open-source collection of practical, type-safe hooks and composables for everyday frontend development.
+Hooks is an open-source collection of practical, type-safe hooks and composables for everyday frontend development.
 
 This repository contains:
 
@@ -65,6 +65,7 @@ TanStack Start uses the React implementation. Do not create a separate TanStack 
 - Keep components and pages below 200 lines when practical.
 - Put shared components in `apps/docs/app/components/shared`.
 - Put layout components in `apps/docs/app/components/layout`.
+- Reuse existing atom components from `apps/docs/app/components/atom` for buttons, inputs, tabs, pills, popovers and tooltips before hand-rolling equivalent UI.
 - Put reusable types in a `types` directory.
 - Put general helpers in `utils`.
 - Do not add Pinia unless application state becomes complex enough to require it.
@@ -95,9 +96,9 @@ Every public hook or composable must include:
 React hooks and Vue composables use the `use` prefix:
 
 ```ts
-useCopyToClipboard
-useOnline
-useLocalStorage
+useCopyToClipboard;
+useOnline;
+useLocalStorage;
 ```
 
 Framework-independent helper functions should not use `use` unless they are reactive APIs.
