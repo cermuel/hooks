@@ -5,7 +5,7 @@ export default {
   slug: "use-online",
   description: "Track whether the user currently has a network connection.",
   frameworks: ["react", "vue"],
-  addedAt: "2026-09-05",
+  addedAt: "2026-09-05T00:00:00.000Z",
   author: {
     github: "cermuel",
   },

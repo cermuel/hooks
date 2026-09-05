@@ -4,14 +4,18 @@ import path from "node:path";
 import { stdin as input, stdout as output } from "node:process";
 import readline from "node:readline";
 import { createInterface } from "node:readline/promises";
+import { pathToFileURL } from "node:url";
 
-import { generateHooksRegistry, readHookMetadata } from "./generate-hooks-registry.ts";
 import type { HookFramework, HookMetadata } from "../packages/hooks/src/types/hook";
 
 const rootDir = process.cwd();
 const hooksDir = path.join(rootDir, "packages/hooks/src/hooks");
 const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
+type HooksRegistryModule = {
+  generateHooksRegistry: () => Promise<string>;
+  readHookMetadata: () => Promise<HookMetadata[]>;
+};
 const color = {
   cyan: (value: string) => `\x1b[36m${value}\x1b[0m`,
   dim: (value: string) => `\x1b[2m${value}\x1b[0m`,
@@ -26,6 +30,12 @@ async function readScriptedAnswers(): Promise<string[]> {
   }
 
   return source.split(/\r?\n/);
+}
+
+async function loadHooksRegistryModule(): Promise<HooksRegistryModule> {
+  const moduleUrl = pathToFileURL(path.join(rootDir, "scripts/generate-hooks-registry.ts"));
+
+  return (await import(moduleUrl.href)) as HooksRegistryModule;
 }
 
 function clearLines(count: number): void {
@@ -179,6 +189,7 @@ async function main(): Promise<void> {
   }
 
   try {
+    const { generateHooksRegistry, readHookMetadata } = await loadHooksRegistryModule();
     const metadata = await readHookMetadata();
 
     if (metadata.length === 0) {

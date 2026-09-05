@@ -1,7 +1,7 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
-import { generateHooksRegistry, readHookMetadata } from "./generate-hooks-registry.ts";
 import type { HookFramework, HookMetadata } from "../packages/hooks/src/types/hook";
 
 const rootDir = process.cwd();
@@ -11,7 +11,16 @@ const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
 const validFrameworks = ["react", "vue"] satisfies HookFramework[];
 const hookNamePattern = /^use[A-Z][A-Za-z0-9]*$/;
-const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+type HooksRegistryModule = {
+  generateHooksRegistry: () => Promise<string>;
+  readHookMetadata: () => Promise<HookMetadata[]>;
+};
+
+async function loadHooksRegistryModule(): Promise<HooksRegistryModule> {
+  const moduleUrl = pathToFileURL(path.join(rootDir, "scripts/generate-hooks-registry.ts"));
+
+  return (await import(moduleUrl.href)) as HooksRegistryModule;
+}
 
 function slugFromHookName(name: string): string {
   return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -37,7 +46,7 @@ function isHookMetadata(value: HookMetadata): boolean {
     value.frameworks.length > 0 &&
     value.frameworks.every((framework) => validFrameworks.includes(framework)) &&
     typeof value.addedAt === "string" &&
-    datePattern.test(value.addedAt) &&
+    !Number.isNaN(Date.parse(value.addedAt)) &&
     (value.author === undefined ||
       (typeof value.author.github === "string" && value.author.github.length > 0))
   );
@@ -48,7 +57,8 @@ async function main(): Promise<void> {
   const hookDirs = (await readdir(hooksDir, { withFileTypes: true }).catch(() => []))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .toSorted();
+    .sort();
+  const { generateHooksRegistry, readHookMetadata } = await loadHooksRegistryModule();
   const metadata = await readHookMetadata();
   const reactExports = await readFile(reactExportsPath, "utf8").catch(() => "");
   const vueExports = await readFile(vueExportsPath, "utf8").catch(() => "");

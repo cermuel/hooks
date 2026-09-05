@@ -3,11 +3,8 @@ import path from "node:path";
 import { stdin as input, stdout as output } from "node:process";
 import readline from "node:readline";
 import { createInterface } from "node:readline/promises";
+import { pathToFileURL } from "node:url";
 
-import {
-  generateHooksRegistry,
-  readHookMetadata,
-} from "./generate-hooks-registry.ts";
 import type {
   HookFramework,
   HookMetadata,
@@ -19,6 +16,11 @@ const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
 const hookNamePattern = /^use[A-Z][A-Za-z0-9]*$/;
 const validFrameworks = ["react", "vue"] satisfies HookFramework[];
+type HookName = HookMetadata["name"];
+type HooksRegistryModule = {
+  generateHooksRegistry: () => Promise<string>;
+  readHookMetadata: () => Promise<HookMetadata[]>;
+};
 const color = {
   cyan: (value: string) => `\x1b[36m${value}\x1b[0m`,
   dim: (value: string) => `\x1b[2m${value}\x1b[0m`,
@@ -30,7 +32,17 @@ function slugFromHookName(name: string): string {
 }
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return new Date().toISOString();
+}
+
+function isHookName(name: string): name is HookName {
+  return hookNamePattern.test(name);
+}
+
+async function loadHooksRegistryModule(): Promise<HooksRegistryModule> {
+  const moduleUrl = pathToFileURL(path.join(rootDir, "scripts/generate-hooks-registry.ts"));
+
+  return (await import(moduleUrl.href)) as HooksRegistryModule;
 }
 
 function parseFrameworks(value: string): HookFramework[] {
@@ -69,6 +81,7 @@ async function getAvailabilityError(
   name: string,
   slug: string
 ): Promise<string | undefined> {
+  const { readHookMetadata } = await loadHooksRegistryModule();
   const metadata = await readHookMetadata();
   const reactExports = await readFile(reactExportsPath, "utf8").catch(() => "");
   const vueExports = await readFile(vueExportsPath, "utf8").catch(() => "");
@@ -357,18 +370,19 @@ async function main(): Promise<void> {
   }
 
   try {
-    let name = "";
+    let name: HookName = "useHook";
     let slug = "";
 
     while (true) {
-      name = (await ask("Hook name: ")).trim();
+      const hookName = (await ask("Hook name: ")).trim();
 
-      if (!hookNamePattern.test(name)) {
+      if (!isHookName(hookName)) {
         console.log('✗ Hook names must begin with "use" and use camelCase.');
         console.log("Example: useOnline\n");
         continue;
       }
 
+      name = hookName;
       console.log("\nChecking availability...");
       slug = slugFromHookName(name);
       const availabilityError = await getAvailabilityError(name, slug);
@@ -433,6 +447,7 @@ async function main(): Promise<void> {
       console.log("✓ Updated Vue exports");
     }
 
+    const { generateHooksRegistry } = await loadHooksRegistryModule();
     await generateHooksRegistry();
     console.log("✓ Updated hooks registry");
 
