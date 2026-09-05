@@ -1,8 +1,9 @@
 import { rm, readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
-import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import readline from "node:readline";
+import { createInterface } from "node:readline/promises";
 
 import { generateHooksRegistry, readHookMetadata } from "./generate-hooks-registry.ts";
 import type { HookFramework, HookMetadata } from "../packages/hooks/src/types/hook";
@@ -11,6 +12,11 @@ const rootDir = process.cwd();
 const hooksDir = path.join(rootDir, "packages/hooks/src/hooks");
 const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
+const color = {
+  cyan: (value: string) => `\x1b[36m${value}\x1b[0m`,
+  dim: (value: string) => `\x1b[2m${value}\x1b[0m`,
+  green: (value: string) => `\x1b[32m${value}\x1b[0m`,
+};
 
 async function readScriptedAnswers(): Promise<string[]> {
   let source = "";
@@ -20,6 +26,84 @@ async function readScriptedAnswers(): Promise<string[]> {
   }
 
   return source.split(/\r?\n/);
+}
+
+function clearLines(count: number): void {
+  if (count > 0) {
+    output.write(`\x1b[${count}A\x1b[0J`);
+  }
+}
+
+async function selectHook(metadata: HookMetadata[]): Promise<string> {
+  let cursor = 0;
+  let renderedLines = 0;
+
+  readline.emitKeypressEvents(input);
+
+  if (input.isTTY) {
+    input.setRawMode(true);
+  }
+
+  function render(): void {
+    clearLines(renderedLines);
+    const lines = [
+      `${color.cyan("?")} Select hook to remove ${color.dim("(Use arrows, Enter to confirm)")}`,
+      ...metadata.map((hook, index) => {
+        const pointer = index === cursor ? color.cyan("❯") : " ";
+        const detail = color.dim(`packages/hooks/src/hooks/${hook.slug}`);
+        return `${pointer} ${hook.name} ${detail}`;
+      }),
+    ];
+
+    output.write(`${lines.join("\n")}\n`);
+    renderedLines = lines.length;
+  }
+
+  return new Promise((resolve, reject) => {
+    function cleanup(): void {
+      input.off("keypress", onKeypress);
+
+      if (input.isTTY) {
+        input.setRawMode(false);
+      }
+    }
+
+    function onKeypress(_: string, key: readline.Key): void {
+      if (key.ctrl && key.name === "c") {
+        cleanup();
+        reject(new Error("Prompt cancelled."));
+        return;
+      }
+
+      if (key.name === "up") {
+        cursor = (cursor - 1 + metadata.length) % metadata.length;
+        render();
+        return;
+      }
+
+      if (key.name === "down") {
+        cursor = (cursor + 1) % metadata.length;
+        render();
+        return;
+      }
+
+      if (key.name === "return" || key.name === "enter") {
+        const hook = metadata[cursor];
+
+        if (!hook) {
+          return;
+        }
+
+        cleanup();
+        clearLines(renderedLines);
+        output.write(`${color.green("✓")} Select hook to remove ${hook.name}\n`);
+        resolve(hook.name);
+      }
+    }
+
+    input.on("keypress", onKeypress);
+    render();
+  });
 }
 
 function matchesHook(hook: HookMetadata, query: string): boolean {
@@ -84,6 +168,16 @@ async function main(): Promise<void> {
     return prompts?.question(question) ?? "";
   }
 
+  async function askConfirm(message: string): Promise<boolean> {
+    if (scriptedAnswers) {
+      const answer = (await ask(`${message} [y/N] `)).trim().toLowerCase();
+      return answer === "y" || answer === "yes";
+    }
+
+    const answer = (await ask(`${message} ${color.dim("[y/N]")} `)).trim().toLowerCase();
+    return answer === "y" || answer === "yes";
+  }
+
   try {
     const metadata = await readHookMetadata();
 
@@ -92,7 +186,11 @@ async function main(): Promise<void> {
     }
 
     const requestedHook = process.argv[2]?.trim();
-    const hookName = requestedHook || (await ask(`Hook to remove (${metadata.map((hook) => hook.name).join(", ")}): `)).trim();
+    const hookName =
+      requestedHook ||
+      (scriptedAnswers
+        ? (await ask(`Hook to remove (${metadata.map((hook) => hook.name).join(", ")}): `)).trim()
+        : await selectHook(metadata));
     const hook = metadata.find((entry) => matchesHook(entry, hookName));
 
     if (!hook) {
@@ -106,18 +204,14 @@ async function main(): Promise<void> {
       console.log(`\n${hook.name} has uncommitted changes:`);
       console.log(uncommittedChanges);
 
-      const dirtyConfirmation = (await ask(`Continue removing ${hook.name} anyway? [y/N] `)).trim().toLowerCase();
-
-      if (dirtyConfirmation !== "y" && dirtyConfirmation !== "yes") {
+      if (!(await askConfirm(`Continue removing ${hook.name} anyway?`))) {
         console.log("Removal cancelled.");
         return;
       }
     }
 
     console.log(`\nYou are about to remove ${hook.name} from ${frameworks}.`);
-    const confirmation = (await ask("Continue? [y/N] ")).trim().toLowerCase();
-
-    if (confirmation !== "y" && confirmation !== "yes") {
+    if (!(await askConfirm("Continue?"))) {
       console.log("Removal cancelled.");
       return;
     }

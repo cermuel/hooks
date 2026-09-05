@@ -1,10 +1,17 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import readline from "node:readline";
+import { createInterface } from "node:readline/promises";
 
-import { generateHooksRegistry, readHookMetadata } from "./generate-hooks-registry.ts";
-import type { HookFramework, HookMetadata } from "../packages/hooks/src/types/hook";
+import {
+  generateHooksRegistry,
+  readHookMetadata,
+} from "./generate-hooks-registry.ts";
+import type {
+  HookFramework,
+  HookMetadata,
+} from "../packages/hooks/src/types/hook";
 
 const rootDir = process.cwd();
 const hooksDir = path.join(rootDir, "packages/hooks/src/hooks");
@@ -12,6 +19,11 @@ const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
 const hookNamePattern = /^use[A-Z][A-Za-z0-9]*$/;
 const validFrameworks = ["react", "vue"] satisfies HookFramework[];
+const color = {
+  cyan: (value: string) => `\x1b[36m${value}\x1b[0m`,
+  dim: (value: string) => `\x1b[2m${value}\x1b[0m`,
+  green: (value: string) => `\x1b[32m${value}\x1b[0m`,
+};
 
 function slugFromHookName(name: string): string {
   return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -31,7 +43,12 @@ function parseFrameworks(value: string): HookFramework[] {
     .map((framework) => framework.trim().toLowerCase())
     .filter(Boolean);
 
-  if (selected.length === 0 || selected.some((framework) => !validFrameworks.includes(framework as HookFramework))) {
+  if (
+    selected.length === 0 ||
+    selected.some(
+      (framework) => !validFrameworks.includes(framework as HookFramework)
+    )
+  ) {
     throw new Error('Frameworks must be "react", "vue", or "react, vue".');
   }
 
@@ -39,11 +56,19 @@ function parseFrameworks(value: string): HookFramework[] {
 }
 
 async function folderExists(slug: string): Promise<boolean> {
-  const entries = await readdir(hooksDir, { withFileTypes: true }).catch(() => []);
-  return entries.some((entry) => entry.isDirectory() && entry.name.toLowerCase() === slug.toLowerCase());
+  const entries = await readdir(hooksDir, { withFileTypes: true }).catch(
+    () => []
+  );
+  return entries.some(
+    (entry) =>
+      entry.isDirectory() && entry.name.toLowerCase() === slug.toLowerCase()
+  );
 }
 
-async function assertAvailable(name: string, slug: string): Promise<void> {
+async function getAvailabilityError(
+  name: string,
+  slug: string
+): Promise<string | undefined> {
   const metadata = await readHookMetadata();
   const reactExports = await readFile(reactExportsPath, "utf8").catch(() => "");
   const vueExports = await readFile(vueExportsPath, "utf8").catch(() => "");
@@ -51,20 +76,27 @@ async function assertAvailable(name: string, slug: string): Promise<void> {
   const lowerSlug = slug.toLowerCase();
 
   const matchingMetadata = metadata.find(
-    (hook) => hook.name.toLowerCase() === lowerName || hook.slug.toLowerCase() === lowerSlug,
+    (hook) =>
+      hook.name.toLowerCase() === lowerName ||
+      hook.slug.toLowerCase() === lowerSlug
   );
 
   if (matchingMetadata) {
-    throw new Error(`${name} already exists at packages/hooks/src/hooks/${matchingMetadata.slug}`);
+    return `${name} already exists\nLocation: packages/hooks/src/hooks/${matchingMetadata.slug}`;
   }
 
   if (await folderExists(slug)) {
-    throw new Error(`${name} already has a folder at packages/hooks/src/hooks/${slug}`);
+    return `${name} already has a folder\nLocation: packages/hooks/src/hooks/${slug}`;
   }
 
-  if (reactExports.toLowerCase().includes(name.toLowerCase()) || vueExports.toLowerCase().includes(name.toLowerCase())) {
-    throw new Error(`${name} already appears in package exports.`);
+  if (
+    reactExports.toLowerCase().includes(name.toLowerCase()) ||
+    vueExports.toLowerCase().includes(name.toLowerCase())
+  ) {
+    return `${name} already appears in package exports.`;
   }
+
+  return undefined;
 }
 
 function metadataTemplate(metadata: HookMetadata): string {
@@ -84,7 +116,10 @@ export default {
 `;
 }
 
-function implementationTemplate(name: string, framework: HookFramework): string {
+function implementationTemplate(
+  name: string,
+  framework: HookFramework
+): string {
   if (framework === "vue") {
     return `export function ${name}() {
   // TODO: Add Vue implementation.
@@ -98,7 +133,11 @@ function implementationTemplate(name: string, framework: HookFramework): string 
 `;
 }
 
-function testTemplate(name: string, slug: string, frameworks: HookFramework[]): string {
+function testTemplate(
+  name: string,
+  slug: string,
+  frameworks: HookFramework[]
+): string {
   return `import { describe, expect, it } from "vitest";
 
 import metadata from "./meta";
@@ -165,7 +204,12 @@ TODO: Document parameters and return values.
 `;
 }
 
-async function updateExports(exportPath: string, name: string, slug: string, framework: HookFramework): Promise<void> {
+async function updateExports(
+  exportPath: string,
+  name: string,
+  slug: string,
+  framework: HookFramework
+): Promise<void> {
   const source = await readFile(exportPath, "utf8").catch(() => "");
   const exportLine = `export { ${name} } from "./hooks/${slug}/${framework}";`;
 
@@ -194,6 +238,103 @@ async function readScriptedAnswers(): Promise<string[]> {
   return source.split(/\r?\n/);
 }
 
+function clearLines(count: number): void {
+  if (count > 0) {
+    output.write(`\x1b[${count}A\x1b[0J`);
+  }
+}
+
+async function frameworkCheckbox(): Promise<HookFramework[]> {
+  const choices: Array<{ name: string; value: HookFramework }> = [
+    { name: "React", value: "react" },
+    { name: "Vue", value: "vue" },
+  ];
+  const selected = new Set<HookFramework>(["react", "vue"]);
+  let cursor = 0;
+  let renderedLines = 0;
+
+  readline.emitKeypressEvents(input);
+
+  if (input.isTTY) {
+    input.setRawMode(true);
+  }
+
+  function render(): void {
+    clearLines(renderedLines);
+    const lines = [
+      `${color.cyan("?")} Select frameworks ${color.dim("(Space to toggle, Enter to confirm)")}`,
+      ...choices.map((choice, index) => {
+        const pointer = index === cursor ? color.cyan("❯") : " ";
+        const marker = selected.has(choice.value) ? color.green("◉") : "○";
+        return `${pointer} ${marker} ${choice.name}`;
+      }),
+    ];
+
+    output.write(`${lines.join("\n")}\n`);
+    renderedLines = lines.length;
+  }
+
+  return new Promise((resolve, reject) => {
+    function cleanup(): void {
+      input.off("keypress", onKeypress);
+
+      if (input.isTTY) {
+        input.setRawMode(false);
+      }
+    }
+
+    function onKeypress(_: string, key: readline.Key): void {
+      if (key.ctrl && key.name === "c") {
+        cleanup();
+        reject(new Error("Prompt cancelled."));
+        return;
+      }
+
+      if (key.name === "up") {
+        cursor = (cursor - 1 + choices.length) % choices.length;
+        render();
+        return;
+      }
+
+      if (key.name === "down") {
+        cursor = (cursor + 1) % choices.length;
+        render();
+        return;
+      }
+
+      if (key.name === "space") {
+        const value = choices[cursor]?.value;
+
+        if (!value) {
+          return;
+        }
+
+        if (selected.has(value) && selected.size > 1) {
+          selected.delete(value);
+        } else {
+          selected.add(value);
+        }
+
+        render();
+        return;
+      }
+
+      if (key.name === "return" || key.name === "enter") {
+        cleanup();
+        clearLines(renderedLines);
+        const frameworks = choices.map((choice) => choice.value).filter((value) => selected.has(value));
+        output.write(
+          `${color.green("✓")} Select frameworks ${frameworks.map((framework) => framework === "react" ? "React" : "Vue").join(", ")}\n`
+        );
+        resolve(frameworks);
+      }
+    }
+
+    input.on("keypress", onKeypress);
+    render();
+  });
+}
+
 async function main(): Promise<void> {
   const scriptedAnswers = input.isTTY ? undefined : await readScriptedAnswers();
   const prompts = input.isTTY ? createInterface({ input, output }) : undefined;
@@ -201,6 +342,10 @@ async function main(): Promise<void> {
 
   async function ask(question: string): Promise<string> {
     if (scriptedAnswers) {
+      if (answerIndex >= scriptedAnswers.length) {
+        throw new Error("No more scripted input available.");
+      }
+
       const answer = scriptedAnswers[answerIndex] ?? "";
       answerIndex += 1;
       output.write(question);
@@ -212,18 +357,35 @@ async function main(): Promise<void> {
   }
 
   try {
-    const name = (await ask("Hook name: ")).trim();
+    let name = "";
+    let slug = "";
 
-    if (!hookNamePattern.test(name)) {
-      throw new Error('Hook names must begin with "use" and use camelCase.\nExample: useOnline');
+    while (true) {
+      name = (await ask("Hook name: ")).trim();
+
+      if (!hookNamePattern.test(name)) {
+        console.log('✗ Hook names must begin with "use" and use camelCase.');
+        console.log("Example: useOnline\n");
+        continue;
+      }
+
+      console.log("\nChecking availability...");
+      slug = slugFromHookName(name);
+      const availabilityError = await getAvailabilityError(name, slug);
+
+      if (availabilityError) {
+        console.log(`✗ ${availabilityError}`);
+        console.log("Try another hook name.\n");
+        continue;
+      }
+
+      console.log(`✓ ${name} is available\n`);
+      break;
     }
 
-    console.log("\nChecking availability...");
-    const slug = slugFromHookName(name);
-    await assertAvailable(name, slug);
-    console.log(`✓ ${name} is available\n`);
-
-    const frameworks = parseFrameworks(await ask("Select frameworks (react, vue) [react, vue]: "));
+    const frameworks = scriptedAnswers
+      ? parseFrameworks(await ask("Select frameworks (react, vue) [react, vue]: "))
+      : await frameworkCheckbox();
 
     const github = (await ask("GitHub username (optional): ")).trim();
     const metadata: HookMetadata = {
@@ -239,17 +401,26 @@ async function main(): Promise<void> {
     await mkdir(hookDir, { recursive: false });
 
     for (const framework of frameworks) {
-      await writeFile(path.join(hookDir, `${framework}.ts`), implementationTemplate(name, framework));
+      await writeFile(
+        path.join(hookDir, `${framework}.ts`),
+        implementationTemplate(name, framework)
+      );
       console.log(`✓ Created ${framework}.ts`);
     }
 
     await writeFile(path.join(hookDir, "meta.ts"), metadataTemplate(metadata));
     console.log("✓ Created meta.ts");
 
-    await writeFile(path.join(hookDir, "hook.test.ts"), testTemplate(name, slug, frameworks));
+    await writeFile(
+      path.join(hookDir, "hook.test.ts"),
+      testTemplate(name, slug, frameworks)
+    );
     console.log("✓ Created hook.test.ts");
 
-    await writeFile(path.join(hookDir, "README.md"), readmeTemplate(name, frameworks));
+    await writeFile(
+      path.join(hookDir, "README.md"),
+      readmeTemplate(name, frameworks)
+    );
     console.log("✓ Created README.md");
 
     if (frameworks.includes("react")) {
@@ -266,7 +437,9 @@ async function main(): Promise<void> {
     console.log("✓ Updated hooks registry");
 
     console.log(`\nHook created at:\npackages/hooks/src/hooks/${slug}`);
-    console.log("\nNext:\n1. Add the implementation\n2. Complete the documentation\n3. Run pnpm check");
+    console.log(
+      "\nNext:\n1. Add the implementation\n2. Complete the documentation\n3. Run pnpm check"
+    );
   } finally {
     prompts?.close();
   }
