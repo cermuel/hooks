@@ -7,6 +7,7 @@ Read and follow [`AGENTS.md`](./AGENTS.md) before making changes.
 Additional requirements:
 
 - Inspect existing patterns before creating new files.
+- Reuse existing docs atom components before hand-rolling equivalent UI.
 - Keep changes focused on the requested task.
 - Do not introduce dependencies or architectural changes without a clear reason.
 - Run the required validation commands before completing work.
