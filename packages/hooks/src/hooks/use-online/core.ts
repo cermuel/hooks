@@ -1,4 +1,6 @@
-import { isBrowser } from "./browser";
+function isBrowser(): boolean {
+  return typeof window !== "undefined" && typeof document !== "undefined";
+}
 
 export function getOnlineStatus(): boolean {
   return isBrowser() ? navigator.onLine : true;

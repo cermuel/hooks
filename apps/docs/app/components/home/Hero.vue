@@ -20,7 +20,7 @@ const activeInstallCommand = computed(
         >
           <span class="hero-word">Practical</span>
           <span class="hero-word">hooks</span>
-          <br>
+          <br />
           <span class="hero-word">for</span>
           <span class="hero-word">React,</span>
           <span class="hero-word">Vue</span>
@@ -62,7 +62,7 @@ const activeInstallCommand = computed(
         <span class="font-medium text-foreground">@cermuel/hooks</span>.
       </p>
 
-      <div class="overflow-hidden rounded-3xl border border-border bg-card">
+      <div class="overflow-hidden rounded-lg border border-border bg-card">
         <div class="flex border-b border-border p-2">
           <button
             v-for="manager in PACKAGE_MANAGERS"
@@ -79,8 +79,12 @@ const activeInstallCommand = computed(
             {{ manager.name }}
           </button>
         </div>
-        <div class="p-2">
-          <AtomCodeBlock :code="`$ ${activeInstallCommand}`" command />
+        <div class="p-1">
+          <AtomCodeBlock
+            :code="`$ ${activeInstallCommand}`"
+            command
+            class="rounded-lg"
+          />
         </div>
       </div>
     </section>

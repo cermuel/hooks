@@ -27,16 +27,16 @@
   --glass-thin-bg: rgb(255 255 255 / 0.45);
   --gradient-bg: linear-gradient(135deg, oklch(99% 0 0) 0%, oklch(96% 0.008 210) 100%);
   --gradient-accent: linear-gradient(to right, oklch(72% 0.18 195) 0%, oklch(68% 0.22 295) 100%);
-  --code-surface: oklch(12% 0 0);
-  --code-border: oklch(100% 0 0 / 0.08);
-  --code-base: oklch(92% 0 0);
-  --code-muted: oklch(62% 0 0);
-  --code-prompt: oklch(68% 0 0);
-  --code-command: oklch(72% 0.17 48);
-  --code-package: oklch(76% 0.16 242);
-  --code-flag: oklch(78% 0.14 300);
-  --code-keyword: oklch(78% 0.14 300);
-  --code-string: oklch(76% 0.16 242);
+  --code-surface: oklch(98% 0 0);
+  --code-border: oklch(15% 0 0 / 0.08);
+  --code-base: oklch(22% 0 0);
+  --code-muted: oklch(52% 0 0);
+  --code-prompt: oklch(48% 0 0);
+  --code-command: oklch(45% 0.15 48);
+  --code-package: oklch(50% 0.16 242);
+  --code-flag: oklch(48% 0.15 300);
+  --code-keyword: oklch(48% 0.15 300);
+  --code-string: oklch(50% 0.16 242);
 
   /* shadcn semantic tokens, mapped onto the base. */
   --card-foreground: var(--foreground);
@@ -72,6 +72,14 @@
   --gradient-accent: linear-gradient(to right, oklch(80% 0.18 195) 0%, oklch(72% 0.18 295) 100%);
   --code-surface: oklch(12% 0 0);
   --code-border: rgb(255 255 255 / 0.08);
+  --code-base: oklch(92% 0 0);
+  --code-muted: oklch(62% 0 0);
+  --code-prompt: oklch(68% 0 0);
+  --code-command: oklch(72% 0.17 48);
+  --code-package: oklch(76% 0.16 242);
+  --code-flag: oklch(78% 0.14 300);
+  --code-keyword: oklch(78% 0.14 300);
+  --code-string: oklch(76% 0.16 242);
 }
 
 @theme inline {

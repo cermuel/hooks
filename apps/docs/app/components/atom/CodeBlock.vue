@@ -84,14 +84,7 @@ function tokenizeSnippet(line: string): CodeToken[] {
     }
 
     if (
-      [
-        "import",
-        "export",
-        "from",
-        "function",
-        "const",
-        "return",
-      ].includes(part)
+      ["import", "export", "from", "function", "const", "return"].includes(part)
     ) {
       return { text: part, tone: "keyword" };
     }
@@ -115,17 +108,19 @@ function tokenizeSnippet(line: string): CodeToken[] {
 const lines = computed(() =>
   props.code
     .split("\n")
-    .map((line) => (props.command ? tokenizeCommand(line) : tokenizeSnippet(line)))
+    .map((line) =>
+      props.command ? tokenizeCommand(line) : tokenizeSnippet(line)
+    )
 );
 </script>
 
 <template>
   <pre
-    class="relative overflow-x-auto rounded-[1.25rem] border border-code-border bg-code-surface px-4 py-3 font-mono text-sm leading-7 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)]"
+    class="relative overflow-x-auto rounded-[1.25rem] border border-code-border bg-code-surface dark:bg-code-surface/65 px-3 py-3 font-mono text-xs leading-7 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)]"
   ><code><span
     v-for="(line, lineIndex) in lines"
     :key="lineIndex"
-    class="block whitespace-pre"
+    class="block whitespace-pre-wrap break-word"
   ><span
     v-for="(token, tokenIndex) in line"
     :key="`${lineIndex}-${tokenIndex}`"
