@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { HOOK_CARDS } from "~/constants/home";
+import { FEATURED_HOOK_SLUGS } from "~/constants/home";
+import { getHookBySlug, getPrimaryExample } from "~/utils/hooks";
+
+const hookCards = computed(() =>
+  FEATURED_HOOK_SLUGS.map((slug) => getHookBySlug(slug)).filter(
+    (hook) => hook !== undefined
+  )
+);
 </script>
 
 <template>
@@ -36,12 +43,12 @@ import { HOOK_CARDS } from "~/constants/home";
       class="grid grid-cols-1 gap-4 [grid-auto-rows:19rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
     >
       <article
-        v-for="hook in HOOK_CARDS"
+        v-for="hook in hookCards"
         :key="hook.name"
         class="group/card relative h-full"
       >
         <NuxtLink
-          :to="hook.href"
+          to="/hooks"
           :aria-label="`View ${hook.name}`"
           class="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         />
@@ -50,7 +57,7 @@ import { HOOK_CARDS } from "~/constants/home";
         >
           <div class="relative m-2 mb-0 min-h-0 flex-1 overflow-hidden">
             <AtomCodeBlock
-              :code="hook.snippet"
+              :code="getPrimaryExample(hook, 'react')"
               class="h-full text-left text-xs leading-6"
             />
           </div>

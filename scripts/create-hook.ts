@@ -146,6 +146,11 @@ function implementationTemplate(
 `;
 }
 
+function coreTemplate(): string {
+  return `export {};
+`;
+}
+
 function testTemplate(
   name: string,
   slug: string,
@@ -167,53 +172,29 @@ describe("${name}", () => {
 `;
 }
 
-function readmeTemplate(name: string, frameworks: HookFramework[]): string {
-  const reactExample = frameworks.includes("react")
-    ? `
-## React
+function reactExampleTemplate(name: string): string {
+  const componentName = `${name[0]?.toUpperCase()}${name.slice(1)}Example`;
 
-\`\`\`tsx
-import { ${name} } from "@cermuel/hooks/react";
+  return `import { ${name} } from "@cermuel/hooks/react";
 
-export function Example() {
-  const value = ${name}();
+export function ${componentName}() {
+  const result = ${name}();
 
-  return <pre>{JSON.stringify(value, null, 2)}</pre>;
+  return <pre>{JSON.stringify(result, null, 2)}</pre>;
 }
-\`\`\`
-`
-    : "";
-  const vueExample = frameworks.includes("vue")
-    ? `
-## Vue
+`;
+}
 
-\`\`\`vue
-<script setup lang="ts">
+function vueExampleTemplate(name: string): string {
+  return `<script setup lang="ts">
 import { ${name} } from "@cermuel/hooks/vue";
 
-const value = ${name}();
+const result = ${name}();
 </script>
 
 <template>
-  <pre>{{ value }}</pre>
+  <pre>{{ result }}</pre>
 </template>
-\`\`\`
-`
-    : "";
-
-  return `# ${name}
-
-TODO: Describe what this hook does.
-
-## Installation
-
-\`\`\`bash
-npm install @cermuel/hooks
-\`\`\`
-${reactExample}${vueExample}
-## API
-
-TODO: Document parameters and return values.
 `;
 }
 
@@ -411,8 +392,12 @@ async function main(): Promise<void> {
       ...(github ? { author: { github } } : {}),
     };
     const hookDir = path.join(hooksDir, slug);
+    const examplesDir = path.join(hookDir, "examples");
 
     await mkdir(hookDir, { recursive: false });
+    await mkdir(examplesDir);
+    await writeFile(path.join(hookDir, "core.ts"), coreTemplate());
+    console.log("✓ Created core.ts");
 
     for (const framework of frameworks) {
       await writeFile(
@@ -420,6 +405,18 @@ async function main(): Promise<void> {
         implementationTemplate(name, framework)
       );
       console.log(`✓ Created ${framework}.ts`);
+
+      const examplePath =
+        framework === "react"
+          ? path.join(examplesDir, "react.tsx")
+          : path.join(examplesDir, "vue.vue");
+      const exampleSource =
+        framework === "react"
+          ? reactExampleTemplate(name)
+          : vueExampleTemplate(name);
+
+      await writeFile(examplePath, exampleSource);
+      console.log(`✓ Created examples/${framework === "react" ? "react.tsx" : "vue.vue"}`);
     }
 
     await writeFile(path.join(hookDir, "meta.ts"), metadataTemplate(metadata));
@@ -430,12 +427,6 @@ async function main(): Promise<void> {
       testTemplate(name, slug, frameworks)
     );
     console.log("✓ Created hook.test.ts");
-
-    await writeFile(
-      path.join(hookDir, "README.md"),
-      readmeTemplate(name, frameworks)
-    );
-    console.log("✓ Created README.md");
 
     if (frameworks.includes("react")) {
       await updateExports(reactExportsPath, name, slug, "react");
@@ -453,7 +444,7 @@ async function main(): Promise<void> {
 
     console.log(`\nHook created at:\npackages/hooks/src/hooks/${slug}`);
     console.log(
-      "\nNext:\n1. Add the implementation\n2. Complete the documentation\n3. Run pnpm check"
+      "\nRequired before opening a PR:\n1. Complete the hook implementation\n2. Add a description\n3. Complete the usage examples\n4. Run pnpm check"
     );
   } finally {
     prompts?.close();

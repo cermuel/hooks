@@ -42,6 +42,7 @@ function isHookMetadata(value: HookMetadata): boolean {
     typeof value.slug === "string" &&
     value.slug.length > 0 &&
     typeof value.description === "string" &&
+    value.description.trim().length > 0 &&
     Array.isArray(value.frameworks) &&
     value.frameworks.length > 0 &&
     value.frameworks.every((framework) => validFrameworks.includes(framework)) &&
@@ -50,6 +51,14 @@ function isHookMetadata(value: HookMetadata): boolean {
     (value.author === undefined ||
       (typeof value.author.github === "string" && value.author.github.length > 0))
   );
+}
+
+async function readOptionalFile(filePath: string): Promise<string | undefined> {
+  try {
+    return await readFile(filePath, "utf8");
+  } catch {
+    return undefined;
+  }
 }
 
 async function main(): Promise<void> {
@@ -101,18 +110,36 @@ async function main(): Promise<void> {
       errors.push(`${hook.name} is missing meta.ts.`);
     }
 
-    if (!(await fileExists(path.join(hookDir, "README.md")))) {
-      errors.push(`${hook.name} is missing README.md.`);
-    }
-
     for (const framework of hook.frameworks) {
       const implementationPath = path.join(hookDir, `${framework}.ts`);
+      const examplePath = path.join(
+        hookDir,
+        "examples",
+        framework === "react" ? "react.tsx" : "vue.vue"
+      );
       const exportsPath = framework === "react" ? reactExportsPath : vueExportsPath;
       const exportsSource = framework === "react" ? reactExports : vueExports;
       const expectedExport = `export { ${hook.name} } from "./hooks/${hook.slug}/${framework}";`;
+      const expectedImport = `import { ${hook.name} } from "@cermuel/hooks/${framework}";`;
 
       if (!(await fileExists(implementationPath))) {
         errors.push(`${hook.name} declares ${framework} but is missing ${framework}.ts.`);
+      }
+
+      const exampleSource = await readOptionalFile(examplePath);
+
+      if (exampleSource === undefined) {
+        errors.push(
+          `${hook.name} is missing its ${framework === "react" ? "React" : "Vue"} usage example. Expected: ${path.relative(rootDir, examplePath)}.`
+        );
+      } else {
+        if (!exampleSource.includes(expectedImport)) {
+          errors.push(`${hook.name} ${framework} example must import from @cermuel/hooks/${framework}.`);
+        }
+
+        if (/\bTODO\b/i.test(exampleSource) || /\bresult\b/.test(exampleSource) || /JSON\.stringify/.test(exampleSource)) {
+          errors.push(`${hook.name} ${framework} usage still contains placeholder content.`);
+        }
       }
 
       if (!exportsSource.includes(expectedExport)) {

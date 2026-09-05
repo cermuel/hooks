@@ -116,11 +116,11 @@ const lines = computed(() =>
 
 <template>
   <pre
-    class="relative overflow-x-auto rounded-[1.25rem] border border-code-border bg-code-surface dark:bg-code-surface/65 px-4 py-3 font-mono text-sm leading-7 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)]"
+    class="relative overflow-x-auto rounded-[1.25rem] border border-code-border bg-code-surface dark:bg-code-surface/65 px-3 py-3 font-mono text-xs leading-7 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)]"
   ><code><span
     v-for="(line, lineIndex) in lines"
     :key="lineIndex"
-    class="block whitespace-pre"
+    class="block whitespace-pre-wrap break-word"
   ><span
     v-for="(token, tokenIndex) in line"
     :key="`${lineIndex}-${tokenIndex}`"

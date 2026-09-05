@@ -5,17 +5,4 @@ export const PACKAGE_MANAGERS = [
   { name: "bun", command: "bun add @cermuel/hooks" },
 ];
 
-export const HOOK_CARDS = [
-  {
-    name: "useOnline",
-    description: "Track browser online status with React and Vue adapters.",
-    href: "/hooks",
-    snippet: `import { useOnline } from "@cermuel/hooks/react";
-
-export function Status() {
-  const online = useOnline();
-
-  return online ? "Online" : "Offline";
-}`,
-  },
-];
+export const FEATURED_HOOK_SLUGS = ["use-online"];
