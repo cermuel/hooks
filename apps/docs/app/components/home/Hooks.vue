@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { FEATURED_HOOK_SLUGS } from "~/constants/home";
-import { getHookBySlug, getPrimaryExample } from "~/utils/hooks";
+import { getHookBySlug } from "~/utils/hooks";
+import type { HookFramework } from "../../../../../packages/hooks/src/types/hook";
 
 const hookCards = computed(() =>
   FEATURED_HOOK_SLUGS.map((slug) => getHookBySlug(slug)).filter(
     (hook) => hook !== undefined
   )
+);
+
+const activeFrameworks = reactive<Record<string, HookFramework>>(
+  Object.fromEntries(
+    hookCards.value.map((hook) => [hook.slug, hook.frameworks[0] ?? "react"])
+  ) as Record<string, HookFramework>
 );
 </script>
 
@@ -40,52 +47,14 @@ const hookCards = computed(() =>
     </div>
 
     <div
-      class="grid grid-cols-1 gap-4 [grid-auto-rows:19rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+      class="grid grid-cols-1 gap-4 [grid-auto-rows:20rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
     >
-      <article
+      <UiHookCard
         v-for="hook in hookCards"
         :key="hook.name"
-        class="group/card relative h-full"
-      >
-        <NuxtLink
-          to="/hooks"
-          :aria-label="`View ${hook.name}`"
-          class="absolute inset-0 z-20 rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        />
-        <div
-          class="relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card transition-colors duration-300 contain-[paint] group-hover/card:border-border-strong"
-        >
-          <div class="relative m-2 mb-0 min-h-0 flex-1 overflow-hidden">
-            <AtomCodeBlock
-              :code="getPrimaryExample(hook, 'react')"
-              class="h-full text-left text-xs leading-6"
-            />
-          </div>
-          <div
-            class="flex shrink-0 items-center justify-between gap-3 px-4 py-3.5"
-          >
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <h3
-                  class="truncate font-display text-[0.95rem] font-semibold tracking-normal text-foreground"
-                >
-                  {{ hook.name }}
-                </h3>
-              </div>
-              <p
-                class="mt-0.5 line-clamp-1 text-xs leading-relaxed text-muted-foreground"
-              >
-                {{ hook.description }}
-              </p>
-            </div>
-            <Icon
-              name="lucide:arrow-up-right"
-              class="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-300 group-hover/card:opacity-100"
-              aria-hidden="true"
-            />
-          </div>
-        </div>
-      </article>
+        v-model="activeFrameworks[hook.slug]"
+        :hook="hook"
+      />
     </div>
   </section>
 </template>

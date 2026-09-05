@@ -13,7 +13,7 @@ const activeInstallCommand = computed(
 </script>
 <template>
   <main class="lg:h-dvh flex flex-col items-center justify-center">
-    <section class="relative isolate overflow-hidden px-4 pb-20 pt-20 md:pt-28">
+    <section class="relative isolate overflow-hidden px-4 pb-20 pt-28">
       <div class="mx-auto max-w-7xl text-center">
         <h1
           class="mx-auto max-w-5xl font-display text-5xl font-semibold leading-[0.92] tracking-normal text-foreground sm:text-6xl md:text-7xl"
@@ -40,9 +40,9 @@ const activeInstallCommand = computed(
         >
           <AtomButton
             label="Installation"
-            to="/installation"
+            to="/hooks#installation"
             size="lg"
-            right-icon="lucide:arrow-right"
+            right-icon="lucide:arrow-down-to-line"
             static
           />
           <AtomButton
@@ -51,7 +51,6 @@ const activeInstallCommand = computed(
             variant="secondary"
             size="lg"
             right-icon="lucide:arrow-right"
-            static
           />
         </div>
       </div>

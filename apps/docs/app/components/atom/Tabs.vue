@@ -2,6 +2,7 @@
 import type { ComponentPublicInstance } from "vue";
 
 type TabVariant = "pill" | "line";
+type TabSize = "xs" | "sm" | "md";
 
 type TabItem = {
   label: string;
@@ -14,11 +15,13 @@ const props = withDefaults(
     items: TabItem[];
     modelValue?: string;
     variant?: TabVariant;
+    size?: TabSize;
     ariaLabel?: string;
   }>(),
   {
     modelValue: undefined,
     variant: "pill",
+    size: "md",
     ariaLabel: "Tabs",
   }
 );
@@ -47,7 +50,7 @@ const listClasses = computed(() => [
 ]);
 
 const indicatorClasses = computed(() => [
-  "pointer-events-none absolute transition-[transform,width,opacity] duration-300 ease-out",
+  "pointer-events-none absolute left-0 transition-[transform,width,opacity] duration-300 ease-out",
   props.variant === "pill"
     ? "inset-y-1 rounded-full bg-primary shadow-sm"
     : "-bottom-px h-px bg-primary",
@@ -58,6 +61,24 @@ const indicatorStyle = computed(() => ({
   width: `${indicator.value.width}px`,
   transform: `translateX(${indicator.value.left}px)`,
 }));
+
+const tabSizeClasses = computed(
+  () =>
+    ({
+      xs: "h-6 gap-1 px-2 text-xs",
+      sm: "h-7 gap-1.5 px-2.5 text-xs",
+      md: "h-8 gap-1.5 px-3 text-sm",
+    })[props.size]
+);
+
+const iconSizeClasses = computed(
+  () =>
+    ({
+      xs: "size-3",
+      sm: "size-3.5",
+      md: "size-4",
+    })[props.size]
+);
 
 function updateIndicator() {
   const activeTab = tabRefs.value[activeIndex.value];
@@ -155,7 +176,8 @@ onBeforeUnmount(() => {
       :aria-controls="`panel-${item.value}`"
       :tabindex="activeValue === item.value ? 0 : -1"
       :class="[
-        'relative z-10 inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-medium outline-none',
+        'relative z-10 inline-flex shrink-0 items-center justify-center rounded-full font-medium outline-none',
+        tabSizeClasses,
         'transition-[color,box-shadow,opacity,transform] duration-200 ease-out',
         'focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'active:scale-[0.96]',
@@ -173,7 +195,7 @@ onBeforeUnmount(() => {
       <Icon
         v-if="item.icon"
         :name="item.icon"
-        class="size-4"
+        :class="iconSizeClasses"
         aria-hidden="true"
       />
       {{ item.label }}
