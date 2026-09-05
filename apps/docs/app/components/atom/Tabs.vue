@@ -4,7 +4,7 @@ import type { ComponentPublicInstance } from "vue";
 type TabVariant = "pill" | "line";
 type TabSize = "xs" | "sm" | "md";
 
-type TabItem = {
+export type TabItem = {
   label: string;
   value: string;
   icon?: string;

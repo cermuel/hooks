@@ -9,6 +9,8 @@ const props = withDefaults(
     label?: string;
     triggerLabel?: string;
     triggerIcon?: string;
+    triggerClass?: string;
+    contentClass?: string;
   }>(),
   {
     side: "bottom",
@@ -16,7 +18,9 @@ const props = withDefaults(
     label: undefined,
     triggerLabel: undefined,
     triggerIcon: undefined,
-  },
+    triggerClass: undefined,
+    contentClass: undefined,
+  }
 );
 
 const open = ref(false);
@@ -24,15 +28,18 @@ const root = ref<HTMLElement | null>(null);
 const panelId = `popover-${useId()}`;
 
 const panelClasses = computed(() => [
-  "absolute z-40 min-w-64 rounded-2xl bg-popover p-4 text-sm text-popover-foreground shadow-lg shadow-foreground/10",
+  "absolute z-40 min-w-64 rounded-2xl bg-popover p-4 text-sm text-popover-foreground border",
   "transition-[opacity,transform,filter] duration-150 ease-out",
-  open.value ? "pointer-events-auto opacity-100 blur-0" : "pointer-events-none opacity-0 blur-sm",
+  open.value
+    ? "pointer-events-auto opacity-100 blur-0"
+    : "pointer-events-none opacity-0 blur-sm",
   props.side === "top" ? "bottom-full mb-2" : "top-full mt-2",
   {
     start: "left-0",
     center: "left-1/2 -translate-x-1/2",
     end: "right-0",
   }[props.align],
+  props.contentClass,
   open.value
     ? props.side === "top"
       ? "-translate-y-1"
@@ -46,6 +53,10 @@ const triggerClasses = [
   "hover:border-border-strong hover:bg-card active:scale-[0.96]",
   "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
 ];
+
+const resolvedTriggerClasses = computed(
+  () => props.triggerClass ?? triggerClasses
+);
 
 function toggle() {
   open.value = !open.value;
@@ -82,14 +93,19 @@ onBeforeUnmount(() => {
   <span ref="root" class="relative inline-flex">
     <button
       type="button"
-      :class="triggerClasses"
+      :class="resolvedTriggerClasses"
       :aria-label="label ?? triggerLabel"
       :aria-expanded="open"
       :aria-controls="panelId"
       @click="toggle"
     >
       <slot name="trigger" :open="open">
-        <Icon v-if="triggerIcon" :name="triggerIcon" class="size-4" aria-hidden="true" />
+        <Icon
+          v-if="triggerIcon"
+          :name="triggerIcon"
+          class="size-4"
+          aria-hidden="true"
+        />
         <span>{{ triggerLabel }}</span>
       </slot>
     </button>

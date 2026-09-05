@@ -1,30 +1,14 @@
 <script setup lang="ts">
-import { PACKAGE_MANAGERS } from "~/constants/home";
 import { hooks } from "~/utils/hooks";
-import type { HookFramework } from "../../../../packages/hooks/src/types/hook";
+import type { HookFramework } from "../../../../../packages/hooks/src/types/hook";
 
-const defaultInstallCommand = "npm install @cermuel/hooks";
-const activePackageManager = ref("npm");
 const activeUsageFramework = ref<HookFramework>("react");
-
-const activeInstallCommand = computed(
-  () =>
-    PACKAGE_MANAGERS.find(
-      (manager) => manager.name === activePackageManager.value
-    )?.command ?? defaultInstallCommand
-);
 
 const activeFrameworks = reactive<Record<string, HookFramework>>(
   Object.fromEntries(
     hooks.map((hook) => [hook.slug, hook.frameworks[0] ?? "react"])
   ) as Record<string, HookFramework>
 );
-
-const sidebarSections = [
-  { label: "Installation", href: "#installation" },
-  { label: "Usage", href: "#usage" },
-  { label: "All hooks", href: "#all-hooks" },
-];
 
 const usageTabs = [
   { icon: "simple-icons:react", label: "", value: "react" },
@@ -43,56 +27,18 @@ export function Status() {
 
 const online = useOnline();`,
 };
+
+const activeUsageExample = computed(
+  () => usageExamples[activeUsageFramework.value]
+);
 </script>
 
 <template>
   <div class="lg:h-dvh lg:overflow-hidden">
-    <UiHooksMobileNavSheet :sections="sidebarSections" :hooks="hooks" />
-
     <main
       class="mx-auto grid max-w-7xl gap-10 px-4 pb-28 pt-28 lg:mt-24 lg:h-[calc(100dvh-7.5rem)] lg:grid-cols-[16rem_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden lg:pb-0 lg:pt-0"
     >
-      <aside
-        class="hidden min-h-0 overscroll-contain lg:block lg:h-full lg:overflow-y-auto lg:pr-2"
-      >
-        <nav class="grid gap-8" aria-label="Hooks reference">
-          <section>
-            <p
-              class="text-[0.7rem] font-medium uppercase tracking-[0.22em] text-muted-foreground"
-            >
-              Docs
-            </p>
-            <div class="mt-3 grid gap-1">
-              <a
-                v-for="section in sidebarSections"
-                :key="section.href"
-                :href="section.href"
-                class="rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                {{ section.label }}
-              </a>
-            </div>
-          </section>
-
-          <section>
-            <p
-              class="text-[0.7rem] font-medium uppercase tracking-[0.22em] text-muted-foreground"
-            >
-              Hooks
-            </p>
-            <div class="mt-3 grid gap-1">
-              <a
-                v-for="hook in hooks"
-                :key="hook.slug"
-                :href="`#${hook.slug}`"
-                class="rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                {{ hook.name }}
-              </a>
-            </div>
-          </section>
-        </nav>
-      </aside>
+      <UiSidebar />
 
       <div
         class="min-w-0 overscroll-contain lg:h-full lg:overflow-y-auto lg:pb-14 lg:pr-2"
@@ -113,37 +59,12 @@ const online = useOnline();`,
                 Add the package once
               </h2>
               <p class="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-                Install the package, then import from the React or Vue entry that
-                matches your app.
+                Install the package, then import from the React or Vue entry
+                that matches your app.
               </p>
             </div>
 
-            <div class="overflow-hidden rounded-2xl border border-border bg-card">
-              <div
-                class="flex items-center justify-between gap-2 border-b border-border p-2"
-              >
-                <div class="flex min-w-0">
-                  <button
-                    v-for="manager in PACKAGE_MANAGERS"
-                    :key="manager.name"
-                    type="button"
-                    :class="[
-                      'min-h-8 rounded-2xl px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                      activePackageManager === manager.name
-                        ? 'bg-background text-foreground'
-                        : 'text-muted-foreground hover:text-foreground',
-                    ]"
-                    @click="activePackageManager = manager.name"
-                  >
-                    {{ manager.name }}
-                  </button>
-                </div>
-                <UiCopyButton :value="activeInstallCommand" />
-              </div>
-              <div class="p-2">
-                <AtomCodeBlock :code="`$ ${activeInstallCommand}`" command />
-              </div>
-            </div>
+            <UiInstallationBlock />
           </div>
         </section>
 
@@ -183,7 +104,7 @@ const online = useOnline();`,
               </div>
               <div class="relative m-2 min-h-0 flex-1">
                 <AtomCodeBlock
-                  :code="usageExamples[activeUsageFramework]"
+                  :code="activeUsageExample"
                   class="h-full text-left text-xs leading-6"
                 />
               </div>

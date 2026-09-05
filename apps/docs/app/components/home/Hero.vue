@@ -1,16 +1,3 @@
-<script setup lang="ts">
-import { PACKAGE_MANAGERS } from "~/constants/home";
-
-const defaultInstallCommand = "npm install @cermuel/hooks";
-const activePackageManager = ref("npm");
-
-const activeInstallCommand = computed(
-  () =>
-    PACKAGE_MANAGERS.find(
-      (manager) => manager.name === activePackageManager.value
-    )?.command ?? defaultInstallCommand
-);
-</script>
 <template>
   <main class="lg:h-dvh flex flex-col items-center justify-center">
     <section class="relative isolate overflow-hidden px-4 pb-20 pt-28">
@@ -61,31 +48,7 @@ const activeInstallCommand = computed(
         <span class="font-medium text-foreground">@cermuel/hooks</span>.
       </p>
 
-      <div class="overflow-hidden rounded-lg border border-border bg-card">
-        <div class="flex border-b border-border p-2">
-          <button
-            v-for="manager in PACKAGE_MANAGERS"
-            :key="manager.name"
-            type="button"
-            :class="[
-              'min-h-8 rounded-2xl px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-              activePackageManager === manager.name
-                ? 'bg-background text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
-            ]"
-            @click="activePackageManager = manager.name"
-          >
-            {{ manager.name }}
-          </button>
-        </div>
-        <div class="p-1">
-          <AtomCodeBlock
-            :code="`$ ${activeInstallCommand}`"
-            command
-            class="rounded-lg"
-          />
-        </div>
-      </div>
+      <UiInstallationBlock />
     </section>
   </main>
 </template>

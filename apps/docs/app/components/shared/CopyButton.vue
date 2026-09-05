@@ -43,6 +43,7 @@ function copyValue() {
       />
     </span>
     <span
+      v-if="buttonLabel"
       :key="buttonLabel"
       class="copy-button-label relative inline-flex min-w-10 justify-center"
       aria-hidden="true"
