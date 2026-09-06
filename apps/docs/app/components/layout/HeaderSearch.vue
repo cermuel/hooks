@@ -148,8 +148,7 @@ function selectItem(item = filteredItems.value[activeIndex.value]) {
   if (!item) {
     return;
   }
-
-  console.log("Header search selection:", item);
+  navigateTo(item.to);
   closeSearch({ restoreFocus: false });
 }
 

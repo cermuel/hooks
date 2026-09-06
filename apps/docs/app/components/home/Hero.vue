@@ -44,8 +44,10 @@
     </section>
     <section id="installation" class="mx-auto max-w-2xl px-4 pb-24">
       <p class="mb-5 text-center text-sm text-muted-foreground">
-        Built for React, Vue, Nuxt and TanStack Start. Distributed as
-        <span class="font-medium text-foreground">@cermuel/hooks</span>.
+        A
+        <span class="font-bold animate-pulse text-primary">growing</span>
+        collection of reusable frontend hooks built for React, Vue, Nuxt,
+        TanStack Start
       </p>
 
       <UiInstallationBlock />

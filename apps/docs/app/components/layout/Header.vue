@@ -8,7 +8,7 @@ const isHome = computed(() => route.path === "/");
 <template>
   <header class="pointer-events-none fixed inset-x-0 top-3 z-40 px-3">
     <div
-      class="pointer-events-auto w-full relative mx-auto flex h-12 max-w-full items-center justify-between gap-3 rounded-full border border-border bg-background/70 px-2.5 shadow-sm shadow-foreground/5 backdrop-blur-xl backdrop-saturate-150 transition-[width,max-width,background-color,border-color,box-shadow] duration-300 ease-out"
+      class="pointer-events-auto w-full relative mx-auto flex h-12 max-w-full items-center justify-between gap-3 rounded-full border border-border bg-background/70 px-2.5 shadow-sm shadow-foreground/5 backdrop-blur-xl backdrop-saturate-150 transition-[width,max-width,background-color,border-color,box-shadow] duration-500 ease-in-out"
       :class="isHome ? 'md:max-w-3xl' : ' md:max-w-7xl'"
     >
       <div class="flex items-center gap-4">
@@ -59,11 +59,10 @@ const isHome = computed(() => route.path === "/");
         />
 
         <AtomButton
-          label="Contribute"
-          href="https://github.com/cermuel/hooks/blob/main/CONTRIBUTING.md"
+          label="Publish"
+          to="/publish"
           size="sm"
           left-icon="lucide:git-pull-request-arrow"
-          external
           static
           class="hidden lg:inline-flex"
           handle-mobile
