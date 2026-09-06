@@ -1,4 +1,4 @@
-import { Project } from "ts-morph";
+import { Node, Project, SyntaxKind, type Expression } from "ts-morph";
 
 export interface HookParameter {
   name: string;
@@ -15,6 +15,30 @@ export interface HookApi {
 const project = new Project({
   tsConfigFilePath: "tsconfig.json",
 });
+
+function resolveDefaultValue(initializer: Expression | undefined): string | null {
+  if (!initializer) {
+    return null;
+  }
+
+  if (Node.isIdentifier(initializer)) {
+    const symbol = initializer.getSymbol();
+    const aliasedSymbol = symbol?.getAliasedSymbol();
+    const declarations = aliasedSymbol?.getDeclarations() ?? symbol?.getDeclarations();
+    const declaration = declarations?.find(Node.isVariableDeclaration);
+    const declarationInitializer = declaration?.getInitializer();
+
+    if (declarationInitializer) {
+      return declarationInitializer.getText();
+    }
+  }
+
+  if (initializer.getKind() === SyntaxKind.NoSubstitutionTemplateLiteral) {
+    return initializer.getText();
+  }
+
+  return initializer.getText();
+}
 
 export function extractHookApi(filePath: string, hookName: string): HookApi {
   const sourceFile =
@@ -35,7 +59,7 @@ export function extractHookApi(filePath: string, hookName: string): HookApi {
     return {
       name: parameter.getName(),
       type: typeNode?.getText() ?? parameter.getType().getText(parameter),
-      default: initializer?.getText() ?? null,
+      default: resolveDefaultValue(initializer),
       required:
         !parameter.hasQuestionToken() &&
         !initializer &&

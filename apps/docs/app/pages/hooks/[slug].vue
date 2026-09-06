@@ -506,24 +506,29 @@ useHead(() => ({
                   <div
                     v-for="(param, index) in activeParameters"
                     :key="index"
-                    class="p-2"
+                    class="grid grid-cols-5 items-center py-2"
                   >
-                    <div>
+                    <div
+                      class="col-span-2 flex w-full items-center justify-start px-4"
+                    >
                       <code
                         class="block w-max max-w-full rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
                       >
-                        {{ param.name }}{{ !param.required && "?" }}
+                        {{ param.name }}{{ !param.required ? "?" : "" }}
                       </code>
                     </div>
-                    <div>
+                    <div class="flex w-full items-center justify-center px-4">
                       <code
-                        class="block w-max max-w-full rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
+                        class="block rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
                       >
                         {{ param.type }}
                       </code>
                     </div>
-                    <div>
+                    <div
+                      class="col-span-2 flex w-full items-center justify-end px-4"
+                    >
                       <code
+                        v-if="param.default"
                         class="block w-max max-w-full rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
                       >
                         {{ param.default }}

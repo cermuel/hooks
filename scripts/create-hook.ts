@@ -31,6 +31,28 @@ function slugFromHookName(name: string): string {
   return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
+function toPascalCase(value: string): string {
+  const words = value
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
+
+  return words
+    .map((word) => `${word[0]?.toUpperCase() ?? ""}${word.slice(1)}`)
+    .join("");
+}
+
+function normalizeHookName(value: string): string {
+  if (value.startsWith("use") && hookNamePattern.test(value)) {
+    return value;
+  }
+
+  const withoutUsePrefix = value.replace(/^use(?:[^A-Za-z0-9]+)?/i, "");
+  const pascalName = toPascalCase(withoutUsePrefix);
+
+  return pascalName ? `use${pascalName}` : value;
+}
+
 function today(): string {
   return new Date().toISOString();
 }
@@ -355,11 +377,11 @@ async function main(): Promise<void> {
     let slug = "";
 
     while (true) {
-      const hookName = (await ask("Hook name: ")).trim();
+      const hookName = normalizeHookName((await ask("Hook name: ")).trim());
 
       if (!isHookName(hookName)) {
-        console.log('✗ Hook names must begin with "use" and use camelCase.');
-        console.log("Example: useOnline\n");
+        console.log('✗ Hook names must resolve to the format "useName".');
+        console.log("Examples: useOnline, online, local-storage\n");
         continue;
       }
 

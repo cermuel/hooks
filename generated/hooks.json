@@ -1,5 +1,59 @@
 [
   {
+    "name": "useDebounce",
+    "slug": "use-debounce",
+    "description": "Delay updates to a value until it has stopped changing.",
+    "frameworks": [
+      "react",
+      "vue"
+    ],
+    "addedAt": "2026-09-06T18:37:51.857Z",
+    "author": {
+      "github": "cermuel"
+    },
+    "api": {
+      "react": {
+        "parameters": [
+          {
+            "name": "value",
+            "type": "T",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "delay",
+            "type": "number",
+            "default": "250",
+            "required": false
+          }
+        ],
+        "returnType": "T"
+      },
+      "vue": {
+        "parameters": [
+          {
+            "name": "value",
+            "type": "MaybeRefOrGetter<T>",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "delay",
+            "type": "number",
+            "default": "250",
+            "required": false
+          }
+        ],
+        "returnType": "Ref<T>"
+      }
+    },
+    "source": {
+      "core": "ZXhwb3J0IGNvbnN0IGRlZmF1bHREZWJvdW5jZURlbGF5ID0gMjUwOwoKZXhwb3J0IGZ1bmN0aW9uIHJlc29sdmVEZWJvdW5jZURlbGF5KGRlbGF5OiBudW1iZXIpOiBudW1iZXIgewogIHJldHVybiBOdW1iZXIuaXNGaW5pdGUoZGVsYXkpID8gTWF0aC5tYXgoMCwgZGVsYXkpIDogZGVmYXVsdERlYm91bmNlRGVsYXk7Cn0KCmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVEZWJvdW5jZVRpbWVyKAogIGNhbGxiYWNrOiAoKSA9PiB2b2lkLAogIGRlbGF5OiBudW1iZXIKKTogKCkgPT4gdm9pZCB7CiAgY29uc3QgdGltZW91dCA9IGdsb2JhbFRoaXMuc2V0VGltZW91dChjYWxsYmFjaywgcmVzb2x2ZURlYm91bmNlRGVsYXkoZGVsYXkpKTsKCiAgcmV0dXJuICgpID0+IHsKICAgIGdsb2JhbFRoaXMuY2xlYXJUaW1lb3V0KHRpbWVvdXQpOwogIH07Cn0K",
+      "react": "aW1wb3J0IHsgdXNlRWZmZWN0LCB1c2VTdGF0ZSB9IGZyb20gInJlYWN0IjsKCmltcG9ydCB7IGNyZWF0ZURlYm91bmNlVGltZXIsIGRlZmF1bHREZWJvdW5jZURlbGF5IH0gZnJvbSAiLi9jb3JlIjsKCmV4cG9ydCBmdW5jdGlvbiB1c2VEZWJvdW5jZTxUPih2YWx1ZTogVCwgZGVsYXkgPSBkZWZhdWx0RGVib3VuY2VEZWxheSk6IFQgewogIGNvbnN0IFtkZWJvdW5jZWRWYWx1ZSwgc2V0RGVib3VuY2VkVmFsdWVdID0gdXNlU3RhdGUodmFsdWUpOwoKICB1c2VFZmZlY3QoCiAgICAoKSA9PgogICAgICBjcmVhdGVEZWJvdW5jZVRpbWVyKCgpID0+IHsKICAgICAgICBzZXREZWJvdW5jZWRWYWx1ZSh2YWx1ZSk7CiAgICAgIH0sIGRlbGF5KSwKICAgIFt2YWx1ZSwgZGVsYXldCiAgKTsKCiAgcmV0dXJuIGRlYm91bmNlZFZhbHVlOwp9Cg==",
+      "vue": "aW1wb3J0IHsKICBvbk1vdW50ZWQsCiAgb25Vbm1vdW50ZWQsCiAgc2hhbGxvd1JlZiwKICB0b1ZhbHVlLAogIHdhdGNoLAogIHR5cGUgTWF5YmVSZWZPckdldHRlciwKICB0eXBlIFJlZiwKfSBmcm9tICJ2dWUiOwoKaW1wb3J0IHsgY3JlYXRlRGVib3VuY2VUaW1lciwgZGVmYXVsdERlYm91bmNlRGVsYXkgfSBmcm9tICIuL2NvcmUiOwoKZXhwb3J0IGZ1bmN0aW9uIHVzZURlYm91bmNlPFQ+KAogIHZhbHVlOiBNYXliZVJlZk9yR2V0dGVyPFQ+LAogIGRlbGF5ID0gZGVmYXVsdERlYm91bmNlRGVsYXkKKTogUmVmPFQ+IHsKICBjb25zdCBkZWJvdW5jZWRWYWx1ZSA9IHNoYWxsb3dSZWYodG9WYWx1ZSh2YWx1ZSkpIGFzIFJlZjxUPjsKICBsZXQgY2FuY2VsVGltZXI6ICgoKSA9PiB2b2lkKSB8IHVuZGVmaW5lZDsKICBsZXQgc3RvcFdhdGNoOiAoKCkgPT4gdm9pZCkgfCB1bmRlZmluZWQ7CgogIG9uTW91bnRlZCgoKSA9PiB7CiAgICBzdG9wV2F0Y2ggPSB3YXRjaCgKICAgICAgKCkgPT4gdG9WYWx1ZSh2YWx1ZSksCiAgICAgIChuZXh0VmFsdWUpID0+IHsKICAgICAgICBjYW5jZWxUaW1lcj8uKCk7CiAgICAgICAgY2FuY2VsVGltZXIgPSBjcmVhdGVEZWJvdW5jZVRpbWVyKCgpID0+IHsKICAgICAgICAgIGRlYm91bmNlZFZhbHVlLnZhbHVlID0gbmV4dFZhbHVlOwogICAgICAgIH0sIGRlbGF5KTsKICAgICAgfQogICAgKTsKICB9KTsKCiAgb25Vbm1vdW50ZWQoKCkgPT4gewogICAgY2FuY2VsVGltZXI/LigpOwogICAgc3RvcFdhdGNoPy4oKTsKICB9KTsKCiAgcmV0dXJuIGRlYm91bmNlZFZhbHVlOwp9Cg=="
+    }
+  },
+  {
     "name": "useOnline",
     "slug": "use-online",
     "description": "Track whether the user currently has a network connection.",
