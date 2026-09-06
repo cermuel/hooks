@@ -27,6 +27,7 @@ const props = withDefaults(
     ripple?: boolean;
     ariaLabel?: string;
     external?: boolean;
+    handleMobile?: boolean;
   }>(),
   {
     variant: "default",
@@ -42,6 +43,7 @@ const props = withDefaults(
     to: undefined,
     ariaLabel: undefined,
     external: undefined,
+    handleMobile: false,
   }
 );
 
@@ -232,9 +234,14 @@ function removeRipple(id: number) {
       :class="leftIconClasses"
       aria-hidden="true"
     />
-    <span :class="['relative z-10', iconOnly ? 'sr-only' : undefined]">{{
-      label
-    }}</span>
+    <span
+      :class="[
+        'relative z-10',
+        handleMobile && 'max-sm:hidden',
+        iconOnly ? 'sr-only' : undefined,
+      ]"
+      >{{ label }}</span
+    >
     <Icon
       v-if="rightIcon"
       :name="rightIcon"

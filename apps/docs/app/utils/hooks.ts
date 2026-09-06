@@ -6,6 +6,33 @@ import type {
 } from "../../../../packages/hooks/src/types/hook";
 
 type HookExample = Partial<Record<HookFramework, string>>;
+type HookSource = Partial<Record<HookFramework | "core", string>>;
+
+export interface HookParameter {
+  name: string;
+  type: string;
+  default: string | null;
+  required: boolean;
+}
+
+export interface HookApi {
+  parameters: HookParameter[];
+  returnType: string;
+}
+
+type HookRegistryEntry = HookMetadata & {
+  api?: Partial<Record<HookFramework, HookApi>>;
+  source?: HookSource;
+};
+
+function decodeSource(source: HookSource | undefined): HookSource {
+  return Object.fromEntries(
+    Object.entries(source ?? {}).map(([framework, code]) => [
+      framework,
+      atob(code),
+    ])
+  ) as HookSource;
+}
 
 const exampleModules = import.meta.glob<string>(
   "../../../../packages/hooks/src/hooks/*/examples/*.{tsx,vue}",
@@ -48,10 +75,14 @@ const examplesBySlug = Object.entries(exampleModules).reduce<
 
 export type DocsHook = HookMetadata & {
   examples: HookExample;
+  api: Partial<Record<HookFramework, HookApi>>;
+  source: HookSource;
 };
 
-export const hooks = (hooksRegistry as HookMetadata[]).map((hook) => ({
+export const hooks = (hooksRegistry as HookRegistryEntry[]).map((hook) => ({
   ...hook,
+  api: hook.api ?? {},
+  source: decodeSource(hook.source),
   examples: examplesBySlug[hook.slug] ?? {},
 })) satisfies DocsHook[];
 

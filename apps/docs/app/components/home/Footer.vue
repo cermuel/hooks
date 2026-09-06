@@ -26,11 +26,14 @@
         >
           <NuxtLink
             class="transition-colors hover:text-foreground"
-            to="/installation"
+            to="/hooks#installation"
           >
             Installation
           </NuxtLink>
-          <NuxtLink class="transition-colors hover:text-foreground" to="/usage">
+          <NuxtLink
+            class="transition-colors hover:text-foreground"
+            to="/hooks#usage"
+          >
             Usage
           </NuxtLink>
           <NuxtLink class="transition-colors hover:text-foreground" to="/hooks">
