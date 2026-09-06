@@ -44,7 +44,12 @@ export function extractHookApi(filePath: string, hookName: string): HookApi {
   const sourceFile =
     project.getSourceFile(filePath) ?? project.addSourceFileAtPath(filePath);
 
-  const hookFunction = sourceFile.getFunction(hookName);
+  const hookFunction =
+    sourceFile.getFunction(hookName) ??
+    sourceFile
+      .getExportedDeclarations()
+      .get(hookName)
+      ?.find(Node.isFunctionDeclaration);
 
   if (!hookFunction?.isExported()) {
     throw new Error(

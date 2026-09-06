@@ -519,7 +519,7 @@ useHead(() => ({
                     </div>
                     <div class="flex w-full items-center justify-center px-4">
                       <code
-                        class="block rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
+                        class="block rounded-md bg-muted px-2 py-1 font-mono shrink-0 text-xs text-foreground"
                       >
                         {{ param.type }}
                       </code>
@@ -551,13 +551,13 @@ useHead(() => ({
             <div class="mt-2">
               <div
                 v-if="activeReturnType"
-                class="rounded-[10px] border border-muted bg-card/40 px-3 py-3"
+                class="rounded-[10px] border border-muted bg-card/40 p-1"
               >
-                <code
-                  class="block w-max max-w-full rounded-md bg-muted px-2 py-1 font-mono text-xs text-foreground"
-                >
-                  {{ activeReturnType }}
-                </code>
+                <AtomCodeBlock
+                  :code="activeReturnType"
+                  :class="'rounded-t-none! bg-transparent! border-none!'"
+                  expandable
+                />
               </div>
               <div v-else>
                 <p
