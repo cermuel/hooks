@@ -56,14 +56,13 @@
           >
             GitHub
           </a>
-          <a
+          <NuxtLink
             class="transition-colors hover:text-foreground"
-            href="https://github.com/cermuel/hooks/blob/main/CONTRIBUTING.md"
-            target="_blank"
+            href="/publish"
             rel="noreferrer"
           >
-            Contribute
-          </a>
+            Publish
+          </NuxtLink>
         </nav>
       </div>
     </div>
