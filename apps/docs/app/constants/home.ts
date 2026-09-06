@@ -6,5 +6,3 @@ export const PACKAGE_MANAGERS = [
 ];
 
 export const INSTALL_COMMAND = "npm install @cermuel/hooks";
-
-export const FEATURED_HOOK_SLUGS = ["use-online"];

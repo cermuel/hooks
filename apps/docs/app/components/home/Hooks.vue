@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { FEATURED_HOOK_SLUGS } from "~/constants/home";
 import { getHookBySlug } from "~/utils/hooks";
 import type { HookFramework } from "../../../../../packages/hooks/src/types/hook";
 
-const hookCards = computed(() =>
-  FEATURED_HOOK_SLUGS.map((slug) => getHookBySlug(slug)).filter(
-    (hook) => hook !== undefined
-  )
-);
-
 const activeFrameworks = reactive<Record<string, HookFramework>>(
   Object.fromEntries(
-    hookCards.value.map((hook) => [hook.slug, hook.frameworks[0] ?? "react"])
+    hooks.slice(0, 6).map((hook) => [hook.slug, hook.frameworks[0] ?? "react"])
   ) as Record<string, HookFramework>
 );
 </script>
@@ -50,7 +43,7 @@ const activeFrameworks = reactive<Record<string, HookFramework>>(
       class="grid grid-cols-1 gap-4 [grid-auto-rows:20rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
     >
       <UiHookCard
-        v-for="hook in hookCards"
+        v-for="hook in hooks.slice(0, 6)"
         :key="hook.name"
         v-model="activeFrameworks[hook.slug]"
         :hook="hook"
