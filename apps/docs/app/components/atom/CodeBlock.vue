@@ -60,7 +60,7 @@ const expandOverlayClasses = computed(() => [
   "pointer-events-none absolute inset-x-0 bottom-0 flex h-28 items-end justify-center bg-linear-to-t pb-4 pt-12",
   props.class
     ? "from-card via-card/90 to-transparent"
-    : "from-[#080808] via-[#080808]/90 to-transparent",
+    : "from-code-surface via-code-surface/90 to-transparent",
 ]);
 
 function tokenizeCommand(line: string): CodeToken[] {
@@ -194,7 +194,7 @@ watch(
 <template>
   <div
     :class="[
-      'relative overflow-hidden rounded-[1.25rem] border border-[#242424] bg-[#080808] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)',
+      'relative overflow-hidden rounded-[1.25rem] border border-code-border bg-code-surface shadow-[inset_0_1px_0_rgb(255_255_255_/_0.65)] dark:shadow-[inset_0_1px_0_rgb(255_255_255_/_0.03)]',
       props.class,
     ]"
   >
@@ -236,7 +236,7 @@ watch(
   margin: 0;
   border-radius: 0;
   box-shadow: none;
-  color: #d4d4d4;
+  color: var(--code-base);
   text-shadow: none;
 }
 </style>

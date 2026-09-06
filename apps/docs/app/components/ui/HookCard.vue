@@ -98,7 +98,7 @@ function openHookFromKeyboard(event: KeyboardEvent): void {
           aria-label="Example framework"
           variant="pill"
           size="xs"
-          class="bg-white! dark:bg-black/70! max-h-40 cursor-default"
+          class="bg-white! dark:bg-black/70! max-h-40 overflow-y-scroll cursor-default"
         />
         <NuxtLink
           v-if="hook.author?.github"
