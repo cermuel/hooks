@@ -1,6 +1,6 @@
 {
   "name": "@cermuel/hooks",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Practical, type-safe hooks and composables for everyday frontend development.",
   "type": "module",
   "license": "MIT",
