@@ -7,6 +7,7 @@ import type { HookFramework, HookMetadata } from "../packages/hooks/src/types/ho
 const rootDir = process.cwd();
 const hooksDir = path.join(rootDir, "packages/hooks/src/hooks");
 const registryPath = path.join(rootDir, "generated/hooks.json");
+const rootExportsPath = path.join(rootDir, "packages/hooks/src/index.ts");
 const reactExportsPath = path.join(rootDir, "packages/hooks/src/react.ts");
 const vueExportsPath = path.join(rootDir, "packages/hooks/src/vue.ts");
 const validFrameworks = ["react", "vue"] satisfies HookFramework[];
@@ -69,6 +70,7 @@ async function main(): Promise<void> {
     .sort();
   const { generateHooksRegistry, readHookMetadata } = await loadHooksRegistryModule();
   const metadata = await readHookMetadata();
+  const rootExports = await readFile(rootExportsPath, "utf8").catch(() => "");
   const reactExports = await readFile(reactExportsPath, "utf8").catch(() => "");
   const vueExports = await readFile(vueExportsPath, "utf8").catch(() => "");
   const names = new Map<string, string>();
@@ -76,6 +78,10 @@ async function main(): Promise<void> {
 
   if (hookDirs.length === 0) {
     errors.push("No hook folders found in packages/hooks/src/hooks.");
+  }
+
+  if (!rootExports.includes('export * from "./react";')) {
+    errors.push("Root package entry must export the React hooks barrel.");
   }
 
   for (const hook of metadata) {
